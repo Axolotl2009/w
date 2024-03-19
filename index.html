@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Weather</title>
+<script>
+async function getCountryInfo(countryName) {
+    const response = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}`);
+    const data = await response.json();
+    if (data.length > 0) {
+        const country = data[0];
+        const capital = country.capital;
+        return capital;
+    } else {
+        throw new Error('Country not found');
+    }
+}
+
+async function getWeatherAndCoordinates() {
+    const countryName = document.getElementById('countryName').value;
+    const apiKey ="b570bbef4b600c1a6adf6c83f58308aa";
+    
+    try {
+        const capital = await getCountryInfo(countryName);
+        
+        // Fetch coordinates using OpenStreetMap Nominatim API
+        const coordinatesResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(capital)}`);
+        const coordinatesData = await coordinatesResponse.json();
+        
+        if (coordinatesData.length > 0) {
+            const latitude = parseFloat(coordinatesData[0].lat);
+            const longitude = parseFloat(coordinatesData[0].lon);
+            
+            // Fetch weather using OpenWeatherMap API
+            const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`);
+            const weatherData = await weatherResponse.json();
+            
+            const weatherDescription = weatherData.weather[0].description;
+            const temperatureKelvin = weatherData.main.temp;
+            
+            // Display results
+            document.getElementById('weatherResult').textContent = `Weather in ${capital}: ${weatherDescription}`;
+            document.getElementById('temperatureResult').textContent = `Temperature: ${temperatureKelvin} Kelvin`;
+            document.getElementById('coordinatesResult').textContent = `Coordinates: Latitude ${latitude}, Longitude ${longitude}`;
+        } else {
+            throw new Error('Location not found');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('errorResult').textContent = 'Error: ' + error.message;
+    }
+}
+
+</script>
+</head>
+<body>
+<h2>Find Weather, Coordinates, and Capital by Country Name</h2>
+<form onsubmit="event.preventDefault(); getWeatherAndCoordinates();">
+    <label for="countryName">Enter Country Name:</label>
+    <input type="text" id="countryName" name="countryName" required>
+    <button type="submit">Get Weather</button>
+</form>
+<div id="weatherResult"></div>
+<div id="temperatureResult"></div>
+<div id="coordinatesResult"></div>
+<div id="errorResult" style="color: red;"></div>
+</body>
+</html>

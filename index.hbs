@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Weather</title>
+
+</script>
+</head>
+<body>
+<h2>Find Weather, Coordinates, and Capital by Country Name</h2>
+<form onsubmit="event.preventDefault(); getWeatherAndCoordinates();">
+    <label for="countryName">Enter Country Name:</label>
+    <input type="text" id="countryName" name="countryName" required>
+    <button type="submit">Get Weather</button>
+</form>
+<div id="weatherResult">{{{weatherResult}}}</div>
+<div id="temperatureResult">{{{temperatureResult}}}</div>
+<div id="coordinatesResult">{{{coordinatesResult}}}</div>
+<div id="errorResult" style="color: red;">{{errorResult}}</div>
+</body>
+</html>
